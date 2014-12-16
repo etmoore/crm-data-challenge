@@ -25,23 +25,29 @@ require_relative 'data/crm'
 #   }
 # ]
 
-result = []
-CRM[:companies].each do |company|
-  c_entry = {}
-  c_entry[:name] = company[:name]
-  c_entry[:employees] = []
-  CRM[:people].each do |person|
-    person[:employments].each do |employment|
-      if employment[:company_id] == company[:id]
-        p_entry = {}
-        p_entry[:id] = person[:id]
-        p_entry[:first_name] = person[:first_name]
-        p_entry[:last_name] = person[:last_name]
-        p_entry[:title] = employment[:title]
-        c_entry[:employees] << p_entry
-      end
+def employments_with(person, company_id)
+  person[:employments].select do |employment|
+    employment[:company_id] == company_id
+  end
+end
+
+def employees_of(company_id)
+  CRM[:people].flat_map do |person|
+    employments_with(person, company_id).map do |employment|
+      {
+        id: person[:id],
+        first_name: person[:first_name],
+        last_name: person[:last_name],
+        title: employment[:title],
+      }
     end
   end
-  result << c_entry
+end
+
+result = CRM[:companies].map do |company|
+  {
+    name: company[:name],
+    employees: employees_of(company[:id])
+  }
 end
 pp result
