@@ -23,7 +23,8 @@ require_relative 'data/crm'
 result = []
 CRM[:people].each do |person|
   if person[:employments].empty?
-    person.delete(:employments)
+    person_dup = person.dup
+    person_dup.delete(:employments)
     result << person
   end
 end
