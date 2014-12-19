@@ -23,7 +23,8 @@ require_relative 'data/crm'
 result = []
 CRM[:people].each do |person|
   if person[:employments].empty?
-    result << person.tap {|person| person.delete(:employments)}
+    person.delete(:employments)
+    result << person
   end
 end
 pp result
